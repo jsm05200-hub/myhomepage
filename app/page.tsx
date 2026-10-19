@@ -2,9 +2,10 @@ import Link from "next/link"
 import InteractiveBentoGallery from "@/components/ui/interactive-bento-gallery"
 import BookingForm from "./booking-form"
 import SiteHeader from "./site-header"
+import ZoomImage from "@/components/ui/zoom-image"
 import { Footprints, CupSoda, Moon, Salad, Users, Car, ShieldCheck, Star, Quote } from "lucide-react"
 
-// 사진: Unsplash 무료 이미지(핫링크), 마지막 장은 자체 삽화
+// 사진: PICK 01은 Unsplash 무료 이미지(핫링크), 나머지는 연출 이미지
 const unsplash = (id: string) => `https://images.unsplash.com/photo-${id}?w=800&q=70&auto=format&fit=crop`
 const teaTrends = [
   {
@@ -19,21 +20,21 @@ const teaTrends = [
     title: "차를 코스로 즐기는\n‘차마카세’",
     desc: "1인 2만~4만 원에 차 3~4종과 다과를 곁들이는 차 코스가 인기입니다.",
     source: "코메디닷컴 · 2024.03.14",
-    img: unsplash("1546852199-2d8e8c4aaada"),
+    img: "/images/tea-matcha.webp",
   },
   {
     tag: "#티하우스",
     title: "카페가 질렸다면,\n차 마시러 떠나는 여행",
     desc: "한옥 찻집과 차 박람회가 SNS에서 ‘가 볼 곳’으로 공유됩니다.",
     source: "중앙일보 · 2026.09.18 외 SNS 게시물",
-    img: unsplash("1631682477691-9021a9218860"),
+    img: "/images/tea-window.webp",
   },
   {
     tag: "#가일마을",
     title: "500년 고택 마을,\n쉼터에서 마시는 차 한 잔",
     desc: "돌담길을 걷고 난 오후, 진행자가 우려 주는 차로 쉬어 갑니다.",
     source: "가일마을 1박 2일 프로그램",
-    img: "/images/tea.png",
+    img: "/images/tea-pour.webp",
     ours: true,
   },
 ]
@@ -66,10 +67,10 @@ const mediaItems = [
 ]
 
 const highlights = [
-  { icon: Footprints, title: "돌담과 들판 걷기", desc: "고택 외관과 농경지 가장자리를 천천히" },
-  { icon: CupSoda, title: "쉼터에서 차 한 잔", desc: "진행자가 우려 주는 차로 낮 휴식" },
-  { icon: Moon, title: "마을에서 하룻밤", desc: "저녁은 체험 없이 편히 쉬는 시간" },
-  { icon: Salad, title: "참나물 비빔밥", desc: "아이는 씻고 담고, 어른은 칼과 불" },
+  { icon: Footprints, title: "돌담과 들판 걷기", desc: "고택 외관과 농경지 가장자리를 천천히", img: "/images/program-walk.webp" },
+  { icon: CupSoda, title: "쉼터에서 차 한 잔", desc: "진행자가 우려 주는 차로 낮 휴식", img: "/images/program-tea.webp" },
+  { icon: Moon, title: "마을에서 하룻밤", desc: "저녁은 체험 없이 편히 쉬는 시간", img: "/images/program-stay.webp" },
+  { icon: Salad, title: "참나물 비빔밥", desc: "아이는 씻고 담고, 어른은 칼과 불", img: "/images/program-bibimbap.webp" },
 ]
 
 const days = [
@@ -105,6 +106,18 @@ export default function Page() {
       <section className="relative h-[78vh] min-h-[520px] overflow-hidden bg-[#fbf3dc]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/cover.png" alt="가일마을 풍경 삽화" className="absolute inset-0 h-full w-full object-cover object-right" />
+        {/* 움직이는 표지(제미나이 생성). '움직임 줄이기' 설정이면 숨기고 위 그림을 보여 줌 */}
+        <video
+          src="/videos/hero.mp4"
+          poster="/images/cover.png"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover object-right motion-reduce:hidden"
+        />
         <div className="absolute inset-0 bg-gradient-to-r from-[#fbf3dc] via-[#fbf3dc]/70 to-transparent md:via-transparent" />
         <div className="relative mx-auto flex h-full max-w-5xl flex-col justify-center px-4">
           <p className="text-xs tracking-[0.3em] text-[#6b675d]">GAIL VILLAGE · 안동 풍천면</p>
@@ -130,14 +143,40 @@ export default function Page() {
         <h2 className="font-serif text-2xl font-bold sm:text-3xl">걷고 · 쉬고 · 마시고 · 함께 밥을 만듭니다</h2>
         <p className="mt-2 text-[#6b675d]">한 번에 4~6명. 서로 얼굴을 익힐 만큼만 모입니다.</p>
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
-          {highlights.map(({ icon: Icon, title, desc }) => (
-            <div key={title} className="rounded-2xl bg-white p-5 shadow-sm">
-              <Icon className="h-6 w-6 text-[#4f6b3a]" />
-              <h3 className="mt-3 font-medium">{title}</h3>
-              <p className="mt-1 text-sm text-[#6b675d]">{desc}</p>
+          {highlights.map(({ icon: Icon, title, desc, img }) => (
+            <div key={title} className="group overflow-hidden rounded-2xl bg-white shadow-sm transition-shadow hover:shadow-md">
+              <div className="relative aspect-[4/3] overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={img} alt={title} loading="lazy" className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
+                <span className="absolute left-3 top-3 rounded-full bg-white/90 p-2 shadow-sm">
+                  <Icon className="h-4 w-4 text-[#4f6b3a]" />
+                </span>
+              </div>
+              <div className="p-4 sm:p-5">
+                <h3 className="font-medium">{title}</h3>
+                <p className="mt-1 text-sm text-[#6b675d]">{desc}</p>
+              </div>
             </div>
           ))}
         </div>
+        <p className="mt-2 text-right text-[10px] text-[#8a8577]">사진은 프로그램 분위기를 보여 주는 연출 이미지입니다</p>
+
+        <ZoomImage
+          src="/images/people-tea.webp"
+          alt="고택 마루에 둘러앉아 차를 마시는 가족과 친구들"
+          caption="연출 이미지"
+          className="mt-8 aspect-[16/9] rounded-3xl shadow-sm md:aspect-[21/9]"
+        >
+          <span className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
+          <span className="absolute bottom-0 left-0 p-6 text-white sm:p-10">
+            <span className="block text-xs tracking-[0.3em] text-white/80">TOGETHER</span>
+            <span className="mt-2 block font-serif text-2xl font-bold leading-snug sm:text-4xl">
+              가족 한두 팀,<br />친구 한 모임이 함께
+            </span>
+            <span className="mt-2 block text-sm text-white/80">마루에 둘러앉아 차를 나누는 오후</span>
+          </span>
+          <span className="absolute bottom-3 right-4 text-[10px] text-white/60">연출 이미지</span>
+        </ZoomImage>
       </section>
 
       {/* Gallery */}
@@ -158,10 +197,10 @@ export default function Page() {
           {teaTrends.map((t, i) => (
             <article
               key={t.tag}
-              className={`relative aspect-[4/5] overflow-hidden ${t.ours ? "ring-4 ring-[#c9a96e]" : ""}`}
+              className={`group relative aspect-[4/5] overflow-hidden ${t.ours ? "ring-4 ring-[#c9a96e]" : ""}`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={t.img} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+              <img src={t.img} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-black/10" />
               <div className="relative flex h-full flex-col p-4 text-white">
                 <span className="text-xs font-bold tracking-wider">
@@ -175,7 +214,7 @@ export default function Page() {
             </article>
           ))}
         </div>
-        <p className="mt-2 text-right text-[10px] text-[#8a8577]">사진: Unsplash · 마지막 장은 프로그램 삽화</p>
+        <p className="mt-2 text-right text-[10px] text-[#8a8577]">PICK 01 사진: Unsplash · 나머지는 연출 이미지</p>
 
         <div className="mt-8 overflow-hidden rounded-2xl border border-[#ddd5c3]">
           <table className="w-full text-left text-sm">
@@ -218,6 +257,20 @@ export default function Page() {
             </div>
           ))}
         </div>
+
+        <ZoomImage
+          src="/images/schedule-greens.webp"
+          alt="아이와 보호자가 함께 참나물을 씻는 모습"
+          caption="연출 이미지"
+          className="mt-6 aspect-[16/9] rounded-3xl shadow-sm md:aspect-[21/9]"
+        >
+          <span className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+          <span className="absolute bottom-0 left-0 p-6 text-white sm:p-8">
+            <span className="block text-xs tracking-[0.3em] text-white/80">DAY 2 · 10:40</span>
+            <span className="mt-1 block font-serif text-xl font-bold sm:text-3xl">아이는 씻고 담고, 어른은 칼과 불</span>
+          </span>
+          <span className="absolute bottom-3 right-4 text-[10px] text-white/60">연출 이미지</span>
+        </ZoomImage>
       </section>
 
       {/* Info */}
@@ -283,9 +336,13 @@ export default function Page() {
       </section>
 
       {/* Booking */}
-      <section id="booking" className="scroll-mt-16 bg-[#2f3a28] py-16 text-white">
-        <div className="mx-auto max-w-2xl px-4">
-          <h2 className="font-serif text-2xl font-bold sm:text-3xl">예약 신청</h2>
+      <section id="booking" className="relative scroll-mt-16 overflow-hidden bg-[#2f3a28] py-20 text-white">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/images/booking-dusk.webp" alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#1f2719]/70 via-[#2f3a28]/85 to-[#2f3a28]" />
+        <div className="relative mx-auto max-w-2xl px-4">
+          <p className="text-xs tracking-[0.3em] text-white/70">RESERVATION</p>
+          <h2 className="mt-2 font-serif text-2xl font-bold sm:text-3xl">예약 신청</h2>
           <p className="mt-2 text-sm text-white/70">신청 후 운영자가 연락드려 일정과 참가비를 확정합니다.</p>
           <BookingForm />
         </div>

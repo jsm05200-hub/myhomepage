@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Train, Bus, Car, MapPin, ParkingCircle } from "lucide-react"
 import SiteHeader from "../site-header"
+import ZoomImage from "@/components/ui/zoom-image"
 import VillageMap, { type Place } from "./village-map"
 
 export const metadata: Metadata = { title: "오시는 길 · 가일마을에서 하룻밤" }
@@ -11,6 +12,22 @@ const places: Place[] = [
   { name: "가곡1리 마을회관", lat: 36.5723, lng: 128.5267 },
   { name: "경북도청", lat: 36.5754, lng: 128.5052 },
   { name: "안동역·안동터미널", lat: 36.5744, lng: 128.676 },
+]
+
+// 경로 지도: 카카오맵 길찾기 화면 기반 (2026.10.19 조회)
+const routes = [
+  {
+    src: "/images/route-drive.png",
+    title: "안동역 → 가일마을 → 하회마을",
+    caption: "차량 23.2km · 약 34분, 하회마을은 선택",
+    alt: "안동역에서 가일마을, 하회마을까지 차량 경로 지도",
+  },
+  {
+    src: "/images/route-walk.png",
+    title: "마을회관 → 고택 → 가곡지",
+    caption: "도보 약 857m · 13분",
+    alt: "가곡1리 마을회관에서 고택과 가곡지로 이어지는 도보 동선 지도",
+  },
 ]
 
 const ways = [
@@ -65,6 +82,20 @@ export default function DirectionsPage() {
           >
             네이버 지도에서 보기
           </a>
+        </div>
+
+        <h2 className="mt-12 font-serif text-2xl font-bold">경로 한눈에 보기</h2>
+        <p className="mt-2 text-sm text-[#6b675d]">지도를 누르면 크게 볼 수 있습니다.</p>
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          {routes.map((r) => (
+            <figure key={r.src}>
+              <ZoomImage src={r.src} alt={r.alt} caption={r.caption} className="aspect-[16/9] rounded-2xl bg-white shadow-sm" />
+              <figcaption className="mt-2 text-sm">
+                <span className="font-medium">{r.title}</span>
+                <span className="text-[#6b675d]"> · {r.caption}</span>
+              </figcaption>
+            </figure>
+          ))}
         </div>
 
         <h2 className="mt-12 font-serif text-2xl font-bold">찾아오는 방법</h2>
