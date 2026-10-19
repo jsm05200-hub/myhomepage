@@ -12,13 +12,11 @@ export default function BookingForm() {
   const [sending, setSending] = useState(false)
   const [error, setError] = useState("")
   const total = adults + kids
-  const tooFew = total < 4
-  const tooMany = total > 6
   const tomorrow = new Date(Date.now() + 864e5).toISOString().slice(0, 10)
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    if (tooFew || tooMany || sending) return
+    if (sending) return
     const f = new FormData(e.currentTarget)
     const booking: Booking = {
       date: String(f.get("date")),
@@ -70,15 +68,15 @@ export default function BookingForm() {
       <div className="grid grid-cols-2 gap-4">
         <label className="block text-sm">
           어른
-          <input type="number" min={1} max={6} value={adults} onChange={(e) => setAdults(Number(e.target.value))} className={field} />
+          <input type="number" min={1} value={adults} onChange={(e) => setAdults(Number(e.target.value))} className={field} />
         </label>
         <label className="block text-sm">
           아이
-          <input type="number" min={0} max={5} value={kids} onChange={(e) => setKids(Number(e.target.value))} className={field} />
+          <input type="number" min={0} value={kids} onChange={(e) => setKids(Number(e.target.value))} className={field} />
         </label>
       </div>
-      <p className={`text-sm ${tooFew || tooMany ? "text-amber-300" : "text-white/60"}`} aria-live="polite">
-        총 {total}명 · {tooFew ? "한 회차는 최소 4명부터 진행합니다" : tooMany ? "한 회차는 최대 6명까지입니다" : "참가 가능한 인원입니다"}
+      <p className="text-sm text-white/60" aria-live="polite">
+        총 {total}명 · 한 회차 4~6명을 권장하며, 인원에 맞춰 운영자가 회차를 안내해 드립니다
       </p>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -88,7 +86,7 @@ export default function BookingForm() {
         </label>
         <label className="block text-sm">
           연락처
-          <input name="phone" type="tel" required autoComplete="tel" pattern="0\d{1,2}-?\d{3,4}-?\d{4}" placeholder="010-0000-0000" className={field} />
+          <input name="phone" type="tel" required autoComplete="tel" pattern="\d{3}-\d{4}-\d{4}" title="010-0000-0000 형식으로 입력해 주세요 (하이픈 포함)" placeholder="010-0000-0000" className={field} />
         </label>
       </div>
 
@@ -104,7 +102,7 @@ export default function BookingForm() {
 
       <button
         type="submit"
-        disabled={tooFew || tooMany || sending}
+        disabled={sending}
         className="w-full rounded-full bg-[#c9a96e] py-3 font-medium text-[#2b2a26] hover:bg-[#d6b97f] disabled:cursor-not-allowed disabled:opacity-50"
       >
         {sending ? "보내는 중…" : "예약 신청하기"}
